@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        id="com.geomatys.android.cordova.geo"
+        version="0.0.1">
+
+    <name>GeoLocation Plugin</name>
+
+    <description>
+        
+    </description>
+
+    <license>Apache 2</license>
+    <keywords>cordova,geolocation,geofence,geofencing</keywords>
+
+    <engines>
+        <engine name="cordova" version=">=3.4.0"/>
+        <engine name="cordova-android" version=">=3.7.2" />
+    </engines>
+
+    <asset src="www/OpenLayers.mobile.js" target="OpenLayers.mobile.js"/>
+    <asset src="www/geoloc.map.js" target="geoloc.map.js"/>
+    <asset src="www/openlayers.css" target="openlayers.css"/>
+
+    <js-module src="www/geoloc.plugin.js" name="geoloc">
+        <clobbers target="geoloc"/>
+    </js-module>
+
+    <info>
+        
+    </info>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="Location">
+                <param name="android-package" value="com.geomatys.android.location.LocationPlugin" />
+            </feature>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+            <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+            <uses-permission android:name="android.permission.VIBRATE" />
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <service android:enabled="true" android:name="com.geomatys.android.location.LocationService" />
+        </config-file>
+
+        <dependency id="android.support.v4" url="https://github.com/MobileChromeApps/cordova-plugin-android-support-v4" commit="be140fb103f87faa2a2da8268dbec1d93e32790d"/>
+        <dependency id="com.google.playservices" url="https://github.com/MobileChromeApps/google-play-services" commit="008909a95cbb0255fe8fe008cea7409c85c601bd" />
+
+        <source-file src="src/android/com/geomatys/android/location/LocationPlugin.java" target-dir="src/com/geomatys/android/location/"/>
+        <source-file src="src/android/com/geomatys/android/location/LocationService.java" target-dir="src/com/geomatys/android/location/"/>
+
+    </platform>
+
+</plugin>

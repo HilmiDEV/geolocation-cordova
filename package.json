@@ -1,0 +1,35 @@
+{
+  "name": "geomatys-geolocation",
+  "version": "0.0.1",
+  "description": "",
+  "cordova": {
+    "id": "com.geomatys.android.location",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+http://gitlab.geomatys.com/cmourette/geolocation-cordova.git"
+  },
+  "keywords": [
+    "cordova",
+    "geo",
+    "geofence",
+    "geofencing",
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.4.0"
+    }
+  ],
+  "author": "cmourette",
+  "license": "Apache2",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": ""
+}
