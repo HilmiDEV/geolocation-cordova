@@ -1,19 +1,24 @@
 package com.geomatys.android.location;
 
 import android.app.Service;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Binder;
 import android.util.Log;
-import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import org.json.JSONArray;
+import org.json.JSONException;
 
+import java.util.Date;
 
 
 /**
@@ -49,13 +54,43 @@ public class LocationService extends Service implements
 
     private final IBinder binder = new LocalBinder();
 
-    public void initLocation() {
-        Log.i(TAG,"start location");
+    private PublishService publishService;
+
+
+    private ServiceConnection connection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            PublishService.LocalBinder binder = (PublishService.LocalBinder) service;
+            LocationService.this.publishService = binder.getService();
+            Log.i(LocationService.TAG,"publish service binded");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+    };
+
+    public void initLocation(JSONArray data) {
+        Log.i(TAG,"init location");
+        Log.i(TAG,"params="+data);
         mGoogleApiClient.connect();
     }
 
-    public void startLocation() {
+    public void startLocation(JSONArray data) {
         Log.i(TAG, "start location");
+        Log.i(TAG,"params="+data);
+        try {
+            if (data.length() > 0 && data.getString(0).equalsIgnoreCase("mqtt")) {
+                Intent intent = new Intent(this.getApplicationContext(), PublishService.class);
+                intent.putExtra("url",data.getString(1));
+                intent.putExtra("identifier",data.getString(2));
+                this.getApplicationContext().startService(intent);
+                this.bindService(intent,connection, Context.BIND_AUTO_CREATE);
+            }
+        } catch (JSONException ex){
+            Log.e(TAG,"couldn't get publish param",ex);
+        }
         if (!mGoogleApiClient.isConnected()){
             mGoogleApiClient.connect();
         }
@@ -66,8 +101,12 @@ public class LocationService extends Service implements
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         if (mLastLocation != null) {
-            LocationPlugin.sendNotification(String.valueOf(mLastLocation.getLatitude()), String.valueOf(mLastLocation.getLongitude()), String.valueOf(mLastLocation.getAccuracy()));
+            LocationPlugin.sendNotification(mLastLocation.getLatitude(), mLastLocation.getLongitude(), mLastLocation.getAccuracy());
         }
+    }
+
+    public void startgeofencing(){
+
     }
 
     public void stopLocation() {
@@ -169,7 +208,15 @@ public class LocationService extends Service implements
     @Override
     public void onLocationChanged(Location location) {
         Log.i(TAG, "Loc changed");
-        LocationPlugin.sendNotification(String.valueOf(location.getLatitude()),String.valueOf(location.getLongitude()),String.valueOf(location.getAccuracy()));
+        if (publishService != null){
+            final Date publishDate = publishService.push(location);
+            LocationPlugin.sendNotification(location.getLatitude(), location.getLongitude(), location.getAccuracy(), publishDate);
+        } else {
+            LocationPlugin.sendNotification(location.getLatitude(), location.getLongitude(), location.getAccuracy());
+        }
+
+
+
     }
 
     @Override

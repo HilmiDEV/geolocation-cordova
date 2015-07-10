@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
+import java.util.Date;
 
 
 /**
@@ -92,7 +92,7 @@ public class LocationPlugin extends CordovaPlugin {
         if (service != null) {
             Log.i(LocationService.TAG, "invokeService");
             if ("initLoc".equals(pluginCommand.getAction())) {
-                service.initLocation();
+                service.initLocation(pluginCommand.getData());
                 callbackContext = pluginCommand.getCallbackContext();
                 PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
                 result.setKeepCallback(true);
@@ -102,7 +102,7 @@ public class LocationPlugin extends CordovaPlugin {
                 return true;
             }
             if ("startLoc".equals(pluginCommand.getAction())) {
-                service.startLocation();
+                service.startLocation(pluginCommand.getData());
                 callbackContext = pluginCommand.getCallbackContext();
                 PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
                 result.setKeepCallback(true);
@@ -134,16 +134,16 @@ public class LocationPlugin extends CordovaPlugin {
         });
     }
 
-    public static void sendNotification(String lat, String lon, String accurancy) {
-        sendNotification(createLocationEvent(lat, lon, accurancy));
+    public static void sendNotification(double lat, double lon, float accurancy) {
+        sendNotification(createLocationEvent(lat, lon, accurancy, null, null));
     }
 
     public static void sendNotification(Bundle bundle) {
         if (bundle != null) {
-            final String lat = bundle.getString("lat");
-            final String lon = bundle.getString("lon");
-            final String accurancy = bundle.getString("accurancy");
-            sendNotification(createLocationEvent(lat, lon, accurancy));
+            final double lat = Double.parseDouble(bundle.getString("lat"));
+            final double lon = Double.parseDouble(bundle.getString("lon"));
+            final int accurancy = Integer.parseInt(bundle.getString("accurancy"));
+            sendNotification(createLocationEvent(lat, lon, accurancy, null, null));
         }
     }
 
@@ -157,7 +157,7 @@ public class LocationPlugin extends CordovaPlugin {
         }
     }
 
-    private static JSONObject createLocationEvent(String lat, String lon, String accurancy) {
+    public static JSONObject createLocationEvent(double lat, double lon, float accurancy, Date publishDate, String clientId) {
         JSONObject data = new JSONObject();
         JSONObject coords = new JSONObject();
         try {
@@ -165,11 +165,22 @@ public class LocationPlugin extends CordovaPlugin {
             coords.put("longitude", lon);
             coords.put("accuracy", accurancy);
             data.put("coords",coords);
+            if (publishDate != null) {
+                data.put("publishDate", publishDate);
+            }
+            if (clientId != null){
+                data.put("clientId", clientId);
+            }
+
 
         } catch (JSONException e) {
             throw new RuntimeException("could not create json object", e);
         }
         return data;
+    }
+
+    public static void sendNotification(double latitude, double longitude, float accurancy, Date publishDate) {
+        sendNotification(createLocationEvent(latitude, longitude, accurancy, publishDate, null));
     }
 
     private static class PluginCommand {
