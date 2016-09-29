@@ -56,9 +56,25 @@
             <service android:name="org.eclipse.paho.android.service.MqttService" />
 
         </config-file>
+<!--
+        <dependency id="cordova-android-support-v4" url="https://github.com/HilmiDEV/cordova-android-support-v4.git"/>
 
-        <dependency id="android.support.v4" url="https://github.com/MobileChromeApps/cordova-plugin-android-support-v4" commit="be140fb103f87faa2a2da8268dbec1d93e32790d"/>
-        <dependency id="com.google.playservices" url="https://github.com/MobileChromeApps/google-play-services" commit="008909a95cbb0255fe8fe008cea7409c85c601bd" />
+
+        <dependency id="cordova-plugin-googleplayservices" url="https://github.com/HilmiDEV/cordova-plugin-googleplayservices.git"/>
+
+-->
+
+
+
+
+
+
+
+<source-file src="platforms/android/src/libs/android-support-v4.jar" target-dir="lib" />
+
+<source-file src="platforms/android/src/libs/google-play-services.jar" target-dir="lib" />
+
+
 
 
         <source-file src="src/android/com/geomatys/android/location/LocationPlugin.java" target-dir="src/com/geomatys/android/location/"/>
@@ -66,6 +82,8 @@
         <source-file src="src/android/com/geomatys/android/location/PublishService.java" target-dir="src/com/geomatys/android/location/"/>
         <source-file src="platforms/android/src/libs/org.eclipse.paho.android.service-1.0.2.jar" target-dir="libs" framework="true"/>
         <source-file src="platforms/android/src/libs/org.eclipse.paho.client.mqttv3-1.0.2.jar" target-dir="libs" framework="true"/>
+
+
 
 
     </platform>
